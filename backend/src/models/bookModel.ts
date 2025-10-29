@@ -19,7 +19,7 @@ const bookSchema = new mongoose.Schema<IBook>(
       required: true,
     },
     price: {
-      type: Float16Array,
+      type: Number,
     },
     publishedYear: {
       type: Date,
