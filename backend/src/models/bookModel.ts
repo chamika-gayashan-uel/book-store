@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IBook extends Document {
-  name: String;
-  description: String;
-  price?: Float16Array;
+  name: string;
+  description: string;
+  price?: number;
   publishedYear: Date;
   author: Types.ObjectId
 }

@@ -1,7 +1,7 @@
 import mongoose, { Types, Document, Schema } from "mongoose";
 
 export interface IReview extends Document {
-    comment: String,
+    comment: string,
     rating: number,
     book: Types.ObjectId,
     member: Types.ObjectId

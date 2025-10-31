@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandle';
 import booksRoute from './routes/booksRoute';
+import adminUserRoute from './routes/adminUserRoute';
+import authorRoute from './routes/authorUserRoute';
 
 const app = express();
 
@@ -13,7 +15,9 @@ app.use(express.json());
 
 app.use(cors());
 
-app.use(booksRoute)
+app.use("book", booksRoute)
+app.use("/admin", adminUserRoute)
+app.use("/author", authorRoute)
 
 app.use(errorHandler)
 

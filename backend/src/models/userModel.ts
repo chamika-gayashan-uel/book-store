@@ -1,20 +1,22 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt"
 
 export type UserRole = "Admin" | "Member" | "Author";
 
 export interface IUser extends Document {
-    email: String,
-    firstName: String,
-    lastName: String,
-    password: String,
-    role: UserRole
+    email?: string,
+    firstName: string,
+    lastName: string,
+    password?: string,
+    role: UserRole,
+    comparePassword(password: string): Promise<boolean>
 }
 
 const userSchema = new mongoose.Schema<IUser>({
     email: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
     },
     firstName: {
         type: String,
@@ -25,19 +27,40 @@ const userSchema = new mongoose.Schema<IUser>({
         required: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     role: {
         type: String,
         enum: ["Admin", "Member", "Author"],
         required: true
-    }
-}, { timestamps: true });
+    },
+}, { discriminatorKey: "role", timestamps: true });
 
-userSchema.pre("save", async (next) => {
-    const user = this as unknown as IUser;
-    // if (!user.isSameNode("password"))
+
+userSchema.pre("save", async function (next) {
+    if (!this.isModified('password')) return next();
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(String(this.password), salt)
+        next();
+    } catch (error: any) {
+        next(error)
+    }
 })
 
-export const User = mongoose.model("User", userSchema);
+userSchema.methods.comparePassword = async function (password: string) {
+    try {
+        return await bcrypt.compare(password, this.password)
+    } catch (error) {
+        throw error
+    }
+}
+
+userSchema.methods.toJSON = function () {
+    const user = this.toObject();
+    delete user.password;
+    return user;
+}
+
+export const User = mongoose.model<IUser>("User", userSchema);
