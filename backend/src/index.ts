@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandle';
 import booksRoute from './routes/booksRoute';
 import adminUserRoute from './routes/adminUserRoute';
 import authorRoute from './routes/authorUserRoute';
+import userRoute from './routes/userRoute';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors());
 app.use("book", booksRoute)
 app.use("/admin", adminUserRoute)
 app.use("/author", authorRoute)
+app.use("/user", userRoute)
 
 app.use(errorHandler)
 

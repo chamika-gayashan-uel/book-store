@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 import { IUser, User } from "./userModel";
 
 export interface IAuthor extends IUser {
-    about: string,
+    authorBio: string,
 }
 
 export const authorSchema = new mongoose.Schema<IAuthor>({
-    about: {
+    authorBio: {
         type: String,
         required: false
     },

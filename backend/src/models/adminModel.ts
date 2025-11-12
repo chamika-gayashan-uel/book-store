@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { IUser, User } from "./userModel";
 
 export interface IAdmin extends IUser {
-    email: string
+
 }
 
 
