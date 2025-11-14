@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, UserCog } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LogoImg from '../assets/logo.svg'
 
 export default function RegistrationPage() {
     const [formData, setFormData] = useState({
@@ -25,15 +26,13 @@ export default function RegistrationPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50 p-4">
+            <div className="w-full max-w-2xl">
                 {/* Registration Card */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
-                            <UserCog className="w-8 h-8 text-white" />
-                        </div>
+                        <img src={LogoImg} className='inline-flex items-center justify-center w-32 h-32' />
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
                         <p className="text-gray-500">Sign up to get started</p>
                     </div>
@@ -41,46 +40,50 @@ export default function RegistrationPage() {
                     {/* Form Fields */}
                     <div className="space-y-5">
                         {/* First Name Input */}
-                        <div>
-                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                                First Name
-                            </label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400" />
+
+                        <div className='flex flex-row space-x-5 '>
+                            <div className='w-full'>
+                                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                                    First Name
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <User className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="firstName"
+                                        name="firstName"
+                                        type="text"
+                                        value={formData.firstName}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="John"
+                                    />
                                 </div>
-                                <input
-                                    id="firstName"
-                                    name="firstName"
-                                    type="text"
-                                    value={formData.firstName}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                                    placeholder="John"
-                                />
+                            </div>
+
+                            {/* Last Name Input */}
+                            <div className='w-full'>
+                                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Last Name
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <User className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="lastName"
+                                        name="lastName"
+                                        type="text"
+                                        value={formData.lastName}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
+                                        placeholder="Doe"
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Last Name Input */}
-                        <div>
-                            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                                Last Name
-                            </label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    id="lastName"
-                                    name="lastName"
-                                    type="text"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                                    placeholder="Doe"
-                                />
-                            </div>
-                        </div>
 
                         {/* Email Input */}
                         <div>
@@ -97,7 +100,7 @@ export default function RegistrationPage() {
                                     type="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -118,7 +121,7 @@ export default function RegistrationPage() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
                                     placeholder="••••••••"
                                 />
                                 <button
@@ -146,7 +149,7 @@ export default function RegistrationPage() {
                                     name="role"
                                     value={formData.role}
                                     onChange={handleChange}
-                                    className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none bg-white appearance-none"
+                                    className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none bg-white appearance-none"
                                 >
                                     <option value="user">User</option>
                                     <option value="author">Author</option>
@@ -174,7 +177,7 @@ export default function RegistrationPage() {
                         {/* Submit Button */}
                         <button
                             onClick={handleSubmit}
-                            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all hover:scale-105 mt-2"
+                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold  focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transform transition-all hover:scale-105 mt-2"
                         >
                             Create Account
                         </button>
@@ -218,7 +221,7 @@ export default function RegistrationPage() {
                     {/* Sign In Link */}
                     <p className="mt-6 text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link to={"/login"} className="font-medium text-blue-600 hover:text-blue-700">
+                        <Link to={"/login"} className="font-medium text-teal-600 hover:text-teal-800">
                             Sign in
                         </Link>
                     </p>
@@ -232,6 +235,6 @@ export default function RegistrationPage() {
                     <button className="underline hover:text-gray-700">Privacy Policy</button>
                 </p>
             </div>
-        </div>
+        </div >
     );
 }

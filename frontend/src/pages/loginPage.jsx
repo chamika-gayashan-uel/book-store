@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, Library } from 'lucide-react';
+import LogoImg from '../assets/logo.svg'
 import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
@@ -15,15 +16,13 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50 p-4">
+            <div className="w-full max-w-lg">
                 {/* Login Card */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
-                            <Library className="w-8 h-8 text-white" />
-                        </div>
+                        <img src={LogoImg} className='inline-flex items-center justify-center w-32 h-32' />
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
                         <p className="text-gray-500">Sign in to continue to your account</p>
                     </div>
@@ -44,7 +43,7 @@ export default function LoginPage() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
                                     placeholder="you@example.com"
                                     required
                                 />
@@ -65,7 +64,7 @@ export default function LoginPage() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                                    className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all outline-none"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -91,7 +90,7 @@ export default function LoginPage() {
                                     type="checkbox"
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
                                 />
                                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                                     Remember me
@@ -99,7 +98,7 @@ export default function LoginPage() {
                             </div>
                             <button
                                 type="button"
-                                className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                                className="text-sm font-medium text-teal-800 hover:text-blue-700"
                             >
                                 Forgot password?
                             </button>
@@ -108,7 +107,7 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition-all hover:scale-105"
+                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transform transition-all hover:scale-105"
                         >
                             Sign In
                         </button>
@@ -152,7 +151,7 @@ export default function LoginPage() {
                     {/* Sign Up Link */}
                     <p className="mt-6 text-center text-sm text-gray-600">
                         Don't have an account?{' '}
-                        <Link to={"/registration"} className="font-medium text-blue-600 hover:text-blue-700">
+                        <Link to={"/registration"} className="font-medium text-teal-600 hover:text-teal-800">
                             Sign up
                         </Link>
                     </p>
