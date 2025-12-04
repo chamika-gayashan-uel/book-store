@@ -7,6 +7,7 @@ import { getBookById } from '../controllers/bookController';
 import Spinner from '../components/Spinner';
 import { REACT_BASE_URL } from '../config/evnConfig';
 import { useSelector } from 'react-redux';
+
 export default function BookDetailsPage() {
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
@@ -70,7 +71,7 @@ export default function BookDetailsPage() {
                 <div className="md:col-span-2">
                     <div className="sticky top-8">
                         <img
-                            src={`${REACT_BASE_URL}/${book.coverImage}`}
+                            src={`${REACT_BASE_URL}/uploads/${book._id}.jpg`}
                             alt={book.title}
                             className="w-full rounded-xl shadow-2xl"
                         />
@@ -229,7 +230,7 @@ export default function BookDetailsPage() {
                             onClick={handleBuyNow}
                             disabled={!book.inStock}
                             className={`flex-1 flex items-center justify-center space-x-2 px-8 py-4 rounded-lg font-semibold transition-all transform ${book.inStock
-                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 hover:scale-105 shadow-lg'
+                                ? 'bg-teal-400 shadow-lg text-white'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                         >

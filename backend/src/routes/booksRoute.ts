@@ -20,7 +20,6 @@ const router = express.Router();
 router.post('/create', authHandler, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, isbn, category, price, publisher, publicationYear, pages, language, description, userId } = req.body;
-    const coverImage = req.file?.path;
 
     if (
       !title || !category || !price) {
@@ -29,19 +28,13 @@ router.post('/create', authHandler, async (req: Request, res: Response, next: Ne
       });
     }
 
-    const newBook = { title, isbn, category, price, publisher, publicationYear, pages, language, description, coverImage, author: userId };
+    const newBook = { title, isbn, category, price, publisher, publicationYear, pages, language, description, author: userId };
 
     const book = await Book.create(newBook);
 
-    if (coverImage) {
-      const uploadsDir = path.join(__dirname, "..", "uploads");
-
-      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-      const fileName = book._id;
-      const coverImagePath = path.join(uploadsDir, fileName);
-
-      fs.copyFileSync(coverImage, coverImagePath);
+    if (req.body.coverImage) {
+      const buffer = Buffer.from(req.body.coverImage, "base64");
+      fs.writeFileSync(`uploads/${book._id}.jpg`, buffer);
     }
 
     return res.status(201).json({
@@ -91,30 +84,33 @@ router.get('/:id', authHandler, async (request, response) => {
 });
 
 // Route for Update a Book
-router.put('/:id', async (request, response) => {
+router.put('/update/:id', authHandler, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { id } = req.params;
+    const { title, isbn, category, price, publisher, publicationYear, pages, language, description, userId } = req.body;
+
     if (
-      !request.body.title ||
-      !request.body.author ||
-      !request.body.publishYear
-    ) {
-      return response.status(400).send({
-        message: 'Send all required fields: title, author, publishYear',
+      !title || !category || !price) {
+      return res.status(400).send({
+        message: 'Send all required fields',
       });
     }
 
-    const { id } = request.params;
+    const _book = await Book.findByIdAndUpdate(id, { title, isbn, category, price, publisher, publicationYear, pages, language, description })
 
-    const result = await Book.findByIdAndUpdate(id, request.body);
-
-    if (!result) {
-      return response.status(404).json({ message: 'Book not found' });
+    if (req.body.coverImage && _book) {
+      const buffer = Buffer.from(req.body.coverImage, "base64");
+      fs.writeFileSync(`uploads/${_book._id}.jpg`, buffer);
     }
 
-    return response.status(200).send({ message: 'Book updated successfully' });
+    return res.status(201).json({
+      success: true,
+      _book
+    });
+
   } catch (error: any) {
     console.log(error.message);
-    response.status(500).send({ message: error.message });
+    res.status(500).send({ message: error.message });
   }
 });
 

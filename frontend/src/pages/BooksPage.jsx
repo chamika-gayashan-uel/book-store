@@ -72,7 +72,7 @@ export default function BooksListPage() {
             >
               <div className="h-64 bg-gray-200 overflow-hidden">
                 <img
-                  src={`${REACT_BASE_URL}/${book.coverImage}`}
+                  src={`${REACT_BASE_URL}/uploads/${book._id}.jpg`}
                   alt={book.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />

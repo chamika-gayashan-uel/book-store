@@ -13,7 +13,6 @@ export const createBook = async (payload) => {
         const createBookResponse = await axios.post(`${REACT_BASE_URL}/book/create`, payload, {
             headers: {
                 Authorization: `Bearer ${store.getState().token}`,
-                "Content-Type": "multipart/form-data",
             },
         });
 
@@ -29,6 +28,31 @@ export const createBook = async (payload) => {
         return false;
     }
 }
+export const updateBook = async (payload, id) => {
+
+    try {
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: true }));
+
+        console.log(payload)
+
+        const createBookResponse = await axios.put(`${REACT_BASE_URL}/book/update/${id}`, payload, {
+            headers: {
+                Authorization: `Bearer ${store.getState().token}`,
+            },
+        });
+
+        store.dispatch(setNotification({ message: "Book successfully updated", variant: "success" }));
+
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
+
+        return true;
+    } catch (error) {
+        console.log(error)
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
+        store.dispatch(setNotification({ message: "Field to update book", variant: "error" }));
+        return false;
+    }
+}
 
 export const getBooks = async () => {
     const booksResponse = await axios.get(`${REACT_BASE_URL}/book/`, { timeout: 10000 });
@@ -39,7 +63,6 @@ export const getBookById = async (id) => {
     const bookResponse = await axios.get(`${REACT_BASE_URL}/book/${id}`, {
         timeout: 10000, headers: {
             Authorization: `Bearer ${store.getState().token}`,
-            "Content-Type": "multipart/form-data",
         }
     });
     return bookResponse.data.book

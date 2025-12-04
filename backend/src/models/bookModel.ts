@@ -10,7 +10,7 @@ export interface IBook extends Document {
   publicationYear?: string,
   pages?: string,
   language?: string,
-  coverImage?: string,
+  // coverImage?: string,
   inStock: boolean,
   rating: number,
   author: Types.ObjectId
@@ -48,9 +48,9 @@ const bookSchema = new mongoose.Schema<IBook>(
     pages: {
       type: String,
     },
-    coverImage: {
-      type: String,
-    },
+    // coverImage: {
+    //   type: String,
+    // },
     inStock: {
       type: Boolean,
       default: true
