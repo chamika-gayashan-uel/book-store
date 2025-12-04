@@ -1,29 +1,63 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IBook extends Document {
-  name: string;
-  description: string;
-  price?: number;
-  publishedYear: Date;
+  title: string,
+  isbn?: string,
+  price: number,
+  category: string,
+  description?: string,
+  publisher?: string,
+  publicationYear?: string,
+  pages?: string,
+  language?: string,
+  coverImage?: string,
+  inStock: boolean,
+  rating: number,
   author: Types.ObjectId
 }
 
 const bookSchema = new mongoose.Schema<IBook>(
   {
-    name: {
+    title: {
       type: String,
       required: true,
     },
-    description: {
+    isbn: {
       type: String,
-      required: true,
     },
     price: {
       type: Number,
-    },
-    publishedYear: {
-      type: Date,
       required: true
+    },
+    category: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+    },
+    publisher: {
+      type: String,
+    },
+    publicationYear: {
+      type: String
+    },
+    language: {
+      type: String,
+    },
+    pages: {
+      type: String,
+    },
+    coverImage: {
+      type: String,
+    },
+    inStock: {
+      type: Boolean,
+      default: true
+    },
+    rating: {
+      type: Number,
+      default: 5
     },
     author: {
       type: Schema.Types.ObjectId,

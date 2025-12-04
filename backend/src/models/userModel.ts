@@ -8,6 +8,8 @@ export interface IUser extends Document {
     firstName: string,
     lastName: string,
     password?: string,
+    phone?: string,
+    address?: string,
     role: UserRole,
     comparePassword(password: string): Promise<boolean>
 }
@@ -27,6 +29,12 @@ const userSchema = new mongoose.Schema<IUser>({
         required: true
     },
     password: {
+        type: String
+    },
+    phone: {
+        type: String
+    },
+    address: {
         type: String
     },
     role: {

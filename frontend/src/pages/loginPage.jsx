@@ -1,18 +1,28 @@
-import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, Library } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import LogoImg from '../assets/logo.svg'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../controllers/authController';
+import { useSelector } from 'react-redux';
+import ReactLoading from "react-loading";
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const state = useSelector((state) => state);
+    const navigation = useNavigate();
+
+    useEffect(() => {
+        if (state.user) {
+            navigation("/books")
+        }
+    }, [state.user])
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Login attempted with:', { email, password, rememberMe });
-        // Add your login logic here
+        login({ email, password });
     };
 
     return (
@@ -107,9 +117,13 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transform transition-all hover:scale-105"
+                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 
+                                transform transition-all hover:scale-105 flex items-center justify-center"
                         >
-                            Sign In
+                            {state.loading?.login
+                                ? <ReactLoading type="spin" height={20} width={20} />
+                                : "Sign In"
+                            }
                         </button>
                     </form>
 

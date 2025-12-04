@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, UserCog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LogoImg from '../assets/logo.svg'
+import { registration } from '../controllers/authController';
+import { useSelector } from 'react-redux';
+import ReactLoading from "react-loading"
 
 export default function RegistrationPage() {
     const [formData, setFormData] = useState({
@@ -12,6 +15,7 @@ export default function RegistrationPage() {
         role: 'user'
     });
     const [showPassword, setShowPassword] = useState(false);
+    const state = useSelector((state) => state)
 
     const handleChange = (e) => {
         setFormData({
@@ -21,8 +25,7 @@ export default function RegistrationPage() {
     };
 
     const handleSubmit = () => {
-        console.log('Registration attempted with:', formData);
-        alert(`Registration submitted for: ${formData.firstName} ${formData.lastName}`);
+        registration(formData);
     };
 
     return (
@@ -177,9 +180,14 @@ export default function RegistrationPage() {
                         {/* Submit Button */}
                         <button
                             onClick={handleSubmit}
-                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold  focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transform transition-all hover:scale-105 mt-2"
+                            className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold  focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transform transition-all hover:scale-105 mt-2
+                            flex items-center justify-center"
                         >
-                            Create Account
+                            {state.loading?.register
+                                ? <ReactLoading type="spin" height={20} width={20} />
+                                : "Create Account"
+                            }
+
                         </button>
                     </div>
 

@@ -1,43 +1,70 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { Book } from '../models/bookModel';
+import multer from 'multer'
+import { authHandler } from '../middleware/authHandler';
+import path from 'path';
+import fs from "fs";
+
+// const storage = multer.diskStorage({
+//   destination: "./uploads/",
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   }
+// });
+
+// const upload = multer({ storage });
 
 const router = express.Router();
 
 // Route for Save a new Book
-router.post('/', async (request, response) => {
+router.post('/create', authHandler, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { title, isbn, category, price, publisher, publicationYear, pages, language, description, userId } = req.body;
+    const coverImage = req.file?.path;
+
     if (
-      !request.body.title ||
-      !request.body.author ||
-      !request.body.publishYear
-    ) {
-      return response.status(400).send({
-        message: 'Send all required fields: title, author, publishYear',
+      !title || !category || !price) {
+      return res.status(400).send({
+        message: 'Send all required fields',
       });
     }
-    const newBook = {
-      title: request.body.title,
-      author: request.body.author,
-      publishYear: request.body.publishYear,
-    };
+
+    const newBook = { title, isbn, category, price, publisher, publicationYear, pages, language, description, coverImage, author: userId };
 
     const book = await Book.create(newBook);
 
-    return response.status(201).send(book);
+    if (coverImage) {
+      const uploadsDir = path.join(__dirname, "..", "uploads");
+
+      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+      const fileName = book._id;
+      const coverImagePath = path.join(uploadsDir, fileName);
+
+      fs.copyFileSync(coverImage, coverImagePath);
+    }
+
+    return res.status(201).json({
+      success: true,
+      book
+    });
+
   } catch (error: any) {
     console.log(error.message);
-    response.status(500).send({ message: error.message });
+    res.status(500).send({ message: error.message });
   }
 });
 
 // Route for Get All Books from database
 router.get('/', async (request, response) => {
   try {
-    const books = await Book.find({});
+    const books = await Book.find()
+      .select("coverImage price title")
+      .populate("author", "email firstName lastName")
+      .exec();
 
     return response.status(200).json({
-      count: books.length,
-      data: books,
+      books,
     });
   } catch (error: any) {
     console.log(error.message);
@@ -46,13 +73,17 @@ router.get('/', async (request, response) => {
 });
 
 // Route for Get One Book from database by id
-router.get('/:id', async (request, response) => {
+router.get('/:id', authHandler, async (request, response) => {
   try {
     const { id } = request.params;
 
-    const book = await Book.findById(id);
+    const book = await Book.findById(id).populate("author", "firstName lastName")
+      .exec();
 
-    return response.status(200).json(book);
+    return response.status(200).json({
+      success: true,
+      book
+    });
   } catch (error: any) {
     console.log(error.message);
     response.status(500).send({ message: error.message });

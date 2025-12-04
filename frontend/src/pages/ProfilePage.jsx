@@ -1,12 +1,16 @@
-import { useState } from 'react';
-import { Camera, Edit2, Save, X, Wallet, Mail, User, Phone, MapPin } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Camera, Edit2, Save, X, Wallet, Mail, User, Phone, MapPin, LogOut } from 'lucide-react';
 import Logo from '../assets/Logo.svg';
 import { useNavigate } from 'react-router-dom';
+import { logout, updateUser } from '../controllers/authController';
+import { useSelector } from 'react-redux';
+import ReactLoading from "react-loading"
 
 export default function ProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
     const [walletConnected, setWalletConnected] = useState(false);
     const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop');
+    const state = useSelector((state) => state);
 
     const navigate = useNavigate()
 
@@ -19,6 +23,27 @@ export default function ProfilePage() {
         role: 'User'
     });
 
+    useEffect(() => {
+        if (state.user) {
+            setUserDetails({
+                firstName: state.user.firstName,
+                lastName: state.user.lastName,
+                email: state.user.email,
+                phone: state.user.phone ?? '',
+                address: state.user.address ?? '',
+                role: state.user.role
+            })
+            setEditedDetails({
+                firstName: state.user.firstName,
+                lastName: state.user.lastName,
+                email: state.user.email,
+                phone: state.user.phone ?? '',
+                address: state.user.address ?? '',
+                role: state.user.role
+            })
+        }
+    }, [state.user])
+
     const [editedDetails, setEditedDetails] = useState({ ...userDetails });
 
     const handleNavigation = (page) => {
@@ -26,9 +51,11 @@ export default function ProfilePage() {
     };
 
     const handleImageChange = () => {
-        alert('Image upload functionality would be implemented here');
+        alert('Image upload functionality is under the development');
         // In real implementation, you would handle file upload
     };
+
+    const handleLogOut = () => logout();
 
     const handleEditToggle = () => {
         if (isEditing) {
@@ -37,10 +64,10 @@ export default function ProfilePage() {
         setIsEditing(!isEditing);
     };
 
-    const handleSave = () => {
-        setUserDetails({ ...editedDetails });
+    const handleSave = async () => {
+
+        await updateUser(editedDetails)
         setIsEditing(false);
-        alert('Profile updated successfully!');
     };
 
     const handleInputChange = (field, value) => {
@@ -83,7 +110,17 @@ export default function ProfilePage() {
                 {/* Profile Card */}
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                     {/* Header with gradient */}
-                    <div className="h-32 bg-gradient-to-r from-teal-500 to-cyan-600"></div>
+                    <div className="h-32 bg-gradient-to-r from-teal-500 to-cyan-600">
+                        <div className="flex justify-end px-4 py-4">
+                            <button
+                                onClick={handleLogOut}
+                                className="flex items-center space-x-2 bg-red-700 text-white px-5 py-2 rounded-xl shadow-lg hover:bg-red-800 transition-all"
+                            >
+                                <LogOut className="w-5 h-5" />
+                                <span className="font-medium">Logout</span>
+                            </button>
+                        </div>
+                    </div>
 
                     {/* Profile Picture Section */}
                     <div className="relative px-6 pb-6">
@@ -124,10 +161,16 @@ export default function ProfilePage() {
                                     <>
                                         <button
                                             onClick={handleSave}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all"
+                                            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all
+                                             justify-center"
                                         >
                                             <Save className="w-4 h-4" />
-                                            <span className="font-medium">Save</span>
+                                            {state.loading?.updateProfile
+                                                ? <ReactLoading type="spin" height={14} width={14} />
+                                                : <span className="font-medium">{state.loading?.updateProfile
+                                                    ? <ReactLoading type="spin" height={14} width={14} />
+                                                    : <span className="font-medium">Save</span>}</span>}
+
                                         </button>
                                         <button
                                             onClick={handleEditToggle}
@@ -306,6 +349,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
