@@ -1,4 +1,4 @@
-import { SET_USER, SET_TOKEN, SET_LOADING, SET_NOTIFICATION, CLEAR_NOTIFICATIONS, SET_BOOKS } from "./action"
+import { SET_USER, SET_TOKEN, SET_LOADING, SET_NOTIFICATION, CLEAR_NOTIFICATIONS, SET_BOOKS, SET_ETHEREUM } from "./action"
 import { storeItem, retrieveItem } from "../config/localStorageConfig"
 
 
@@ -7,6 +7,7 @@ const initialState = {
     token: retrieveItem("token"),
     loading: null,
     notification: null,
+    ethereum: null,
     books: []
 }
 
@@ -36,6 +37,12 @@ const rootReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notification: action.payload
+            }
+        }
+        case (SET_ETHEREUM): {
+            return {
+                ...state,
+                ethereum: action.payload
             }
         }
         case (CLEAR_NOTIFICATIONS): {

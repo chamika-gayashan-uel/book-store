@@ -7,6 +7,7 @@ import { SnackbarProvider } from 'notistack';
 import { Provider } from 'react-redux';
 import store from './redux/store.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThirdwebProvider } from "thirdweb/react";
 
 const queryClient = new QueryClient()
 
@@ -17,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       autoHideDuration={2000} >
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <ThirdwebProvider>
+            <App />
+          </ThirdwebProvider>
         </QueryClientProvider>
       </Provider>
     </SnackbarProvider>

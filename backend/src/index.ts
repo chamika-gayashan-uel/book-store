@@ -7,7 +7,6 @@ import booksRoute from './routes/booksRoute';
 import adminUserRoute from './routes/adminUserRoute';
 import authorRoute from './routes/authorUserRoute';
 import authRoute from './routes/authRoute';
-import blockchainRoute from './routes/blockchainRoute';
 import path from "path";
 
 const app = express();
@@ -30,7 +29,6 @@ app.use("/book", booksRoute)
 app.use("/admin", adminUserRoute)
 app.use("/author", authorRoute)
 app.use("/auth", authRoute)
-app.use("/blockchain", blockchainRoute)
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use(errorHandler)

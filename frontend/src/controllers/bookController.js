@@ -1,7 +1,7 @@
 import { REACT_BASE_URL } from "../config/evnConfig";
 import store from "../redux/store";
 import axios from 'axios';
-import { setUser, setLoading, setNotification, setToken, setBooks } from "../redux/action"
+import { setUser, setLoading, setNotification, setToken, setBooks, setEthereumPrice } from "../redux/action"
 
 export const createBook = async (payload) => {
 
@@ -16,11 +16,9 @@ export const createBook = async (payload) => {
             },
         });
 
-        store.dispatch(setNotification({ message: "Book successfully created", variant: "success" }));
-
         store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
 
-        return true;
+        return createBookResponse.data.book._id;
     } catch (error) {
         console.log(error)
         store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
@@ -28,6 +26,26 @@ export const createBook = async (payload) => {
         return false;
     }
 }
+
+export const deleteBook = async (payload) => {
+    try {
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: true }));
+
+        console.log(payload)
+
+        const deleteBookResponse = await axios.post(`${REACT_BASE_URL}/book/delete`, payload, {
+            headers: {
+                Authorization: `Bearer ${store.getState().token}`,
+            },
+        });
+
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
+    } catch (error) {
+        console.log(error)
+        store.dispatch(setLoading({ ...store.getState().loading, createBook: false }));
+    }
+}
+
 export const updateBook = async (payload, id) => {
 
     try {
@@ -66,4 +84,43 @@ export const getBookById = async (id) => {
         }
     });
     return bookResponse.data.book
+}
+
+export const purchaseBook = async (payload) => {
+    try {
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: true }));
+        const bookResponse = await axios.post(`${REACT_BASE_URL}/book/purchase`, payload, {
+            timeout: 10000, headers: {
+                Authorization: `Bearer ${store.getState().token}`,
+            }
+        });
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: false }));
+        return bookResponse.data.purchase
+    } catch (error) {
+        store.dispatch(setNotification({ message: "Field to purchase book", variant: "error" }));
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: false }));
+    }
+
+}
+
+export const removePurchases = async (payload) => {
+    try {
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: true }));
+
+        const deleteBookResponse = await axios.post(`${REACT_BASE_URL}/book/purchase-delete`, payload, {
+            headers: {
+                Authorization: `Bearer ${store.getState().token}`,
+            },
+        });
+
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: false }));
+    } catch (error) {
+        console.log(error)
+        store.dispatch(setLoading({ ...store.getState().loading, buyBook: false }));
+    }
+}
+
+export const getEthPriceUsd = async () => {
+    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum&x_cg_demo_api_key=CG-tQsBFbkVVWZVfZg8QAdDy1gR");
+    store.dispatch(setEthereumPrice(response.data.ethereum.usd))
 }

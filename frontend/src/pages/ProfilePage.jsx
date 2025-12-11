@@ -5,12 +5,19 @@ import { useNavigate } from 'react-router-dom';
 import { logout, updateUser } from '../controllers/authController';
 import { useSelector } from 'react-redux';
 import ReactLoading from "react-loading"
+import CustomWalletConnectButton from "../components/CustomWalletConnectButton"
+import { useDisconnect, useActiveWallet, useActiveAccount } from "thirdweb/react";
 
 export default function ProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
-    const [walletConnected, setWalletConnected] = useState(false);
     const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop');
     const state = useSelector((state) => state);
+    const activeAccount = useActiveAccount()
+
+
+    const { disconnect } = useDisconnect()
+
+    const wallet = useActiveWallet()
 
     const navigate = useNavigate()
 
@@ -55,7 +62,10 @@ export default function ProfilePage() {
         // In real implementation, you would handle file upload
     };
 
-    const handleLogOut = () => logout();
+    const handleLogOut = () => {
+        disconnect(wallet);
+        logout();
+    };
 
     const handleEditToggle = () => {
         if (isEditing) {
@@ -75,11 +85,6 @@ export default function ProfilePage() {
             ...editedDetails,
             [field]: value
         });
-    };
-
-    const handleConnectWallet = () => {
-        setWalletConnected(!walletConnected);
-        alert(walletConnected ? 'Wallet disconnected' : 'Wallet connected successfully!');
     };
 
     return (
@@ -187,28 +192,20 @@ export default function ProfilePage() {
 
                     {/* Wallet Connection Section */}
                     <div className="px-6 pb-6">
-                        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-cyan-200">
+                        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-2 border border-cyan-200">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
-                                    <div className={`p-2 rounded-lg ${walletConnected ? 'bg-cyan-100' : 'bg-gray-100'}`}>
-                                        <Wallet className={`w-6 h-6 ${walletConnected ? 'text-cyan-600' : 'text-gray-600'}`} />
+                                    <div className={`p-2 rounded-lg ${activeAccount ? 'bg-cyan-100' : 'bg-gray-100'}`}>
+                                        <Wallet size={2} className={`w-6 h-6 ${activeAccount ? 'text-cyan-600' : 'text-gray-600'}`} />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-800">Wallet Connection</h3>
+                                        <h3 className="font-semibold text-sm text-gray-800">Wallet Connection</h3>
                                         <p className="text-sm text-gray-600">
-                                            {walletConnected ? 'Wallet Connected: 0x1234...5678' : 'Connect your wallet for payments'}
+                                            {activeAccount?.address ? `Wallet Connected: ${String(activeAccount.address)}` : 'Connect your wallet for payments'}
                                         </p>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={handleConnectWallet}
-                                    className={`px-6 py-2 rounded-lg font-semibold transition-all ${walletConnected
-                                        ? 'bg-red-500 text-white hover:bg-red-600'
-                                        : 'bg-gradient-to-r from-teal-400 to-blue-400 text-white hover:from-teal-500 hover:to-blue-500'
-                                        }`}
-                                >
-                                    {walletConnected ? 'Disconnect' : 'Connect Wallet'}
-                                </button>
+                                <CustomWalletConnectButton />
                             </div>
                         </div>
                     </div>

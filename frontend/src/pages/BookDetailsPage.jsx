@@ -1,16 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BookOpen, Heart, ShoppingCart, Star, RotateCw, User, Calendar, Globe, FileText, BookMarked, SquarePen } from 'lucide-react';
 import Logo from '../assets/Logo.svg';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getBookById } from '../controllers/bookController';
+import { getBookById, purchaseBook, removePurchases } from '../controllers/bookController';
 import Spinner from '../components/Spinner';
 import { REACT_BASE_URL } from '../config/evnConfig';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSendTransaction } from 'thirdweb/react';
+import { setNotification } from '../redux/action';
+import { contract } from '../utilities/contract';
+import CustomWalletConnectButton from '../components/CustomWalletConnectButton';
+import { prepareContractCall } from "thirdweb";
+import ReactLoading from 'react-loading';
 
 export default function BookDetailsPage() {
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
+    const dispatch = useDispatch();
+    const purchaseRef = useRef(null);
+
 
     const { id } = useParams();
     const navigation = useNavigate();
@@ -21,33 +30,64 @@ export default function BookDetailsPage() {
         queryFn: () => getBookById(id),
     });
 
+    const { mutate: sendTransaction, status: txStatus, data: txData, error: contractError } = useSendTransaction();
+
+    useEffect(() => {
+        console.log(txStatus)
+        console.log(txData)
+        console.log(contractError)
+        if (txStatus == 'success') {
+            dispatch(setNotification({ message: "Transaction successful", variant: "error" }))
+        } else if (txStatus == 'error') {
+            removePurchases({ id: purchaseRef.current._id })
+            dispatch(setNotification({ message: contractError.message, variant: "error" }))
+        }
+    }, [txStatus, txData, contractError])
+
     const handleNavigation = (page) => {
         navigation(page)
     };
 
-    const handleBuyNow = () => {
-        alert(`Purchasing ${quantity} copy(ies) of "${book.title}" for $${(book.price * quantity).toFixed(2)}`);
+    const handleBuy = async () => {
+        purchaseBook({ bookId: book._id }).then((purchase) => {
+            handleBuyTransaction(purchase);
+        })
     };
 
-    const handleAddToCart = () => {
-        alert(`Added ${quantity} copy(ies) of "${book.title}" to cart`);
+    const handleBuyTransaction = (purchase) => {
+        try {
+            purchaseRef.current = purchase;
+            const transaction = prepareContractCall({
+                contract,
+                method: "function purchaseBook(string _bookId) payable",
+                params: [purchaseRef.current.book],
+            });
+            sendTransaction(transaction);
+        } catch (error) {
+            removePurchases({ id: purchaseRef.current._id })
+        }
     };
+
+    // const handleAddToCart = () => {
+    //     alert(`Added ${quantity} copy(ies) of "${book.title}" to cart`);
+    // };
 
     const handleToggleWishlist = () => {
         setIsWishlisted(!isWishlisted);
     };
 
-    const incrementQuantity = () => {
-        if (quantity < book.stockCount) {
-            setQuantity(quantity + 1);
-        }
-    };
+    // const incrementQuantity = () => {
+    //     if (quantity < book.stockCount) {
+    //         setQuantity(quantity + 1);
+    //     }
+    // };
 
-    const decrementQuantity = () => {
-        if (quantity > 1) {
-            setQuantity(quantity - 1);
-        }
-    };
+    // const decrementQuantity = () => {
+    //     if (quantity > 1) {
+    //         setQuantity(quantity - 1);
+    //     }
+    // };
+
     const getBookUi = () => {
         if (isLoading) {
             return (
@@ -151,6 +191,7 @@ export default function BookDetailsPage() {
 
                     {/* Book Information */}
                     <div className="grid grid-cols-2 gap-4">
+
                         <div className="flex items-start space-x-3">
                             <FileText className="w-5 h-5 text-gray-400 mt-1" />
                             <div>
@@ -196,7 +237,7 @@ export default function BookDetailsPage() {
                     </div>
 
                     {/* Quantity Selector */}
-                    <div>
+                    {/* <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Quantity
                         </label>
@@ -222,12 +263,12 @@ export default function BookDetailsPage() {
                                 Total: <span className="font-bold text-blue-600">${(book.price * quantity).toFixed(2)}</span>
                             </span>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <button
-                            onClick={handleBuyNow}
+                        {book.author._id == state.user._id ? <></> : < button
+                            onClick={handleBuy}
                             disabled={!book.inStock}
                             className={`flex-1 flex items-center justify-center space-x-2 px-8 py-4 rounded-lg font-semibold transition-all transform ${book.inStock
                                 ? 'bg-teal-400 shadow-lg text-white'
@@ -235,9 +276,9 @@ export default function BookDetailsPage() {
                                 }`}
                         >
                             <ShoppingCart className="w-5 h-5" />
-                            <span>Buy Now</span>
-                        </button>
-                        <button
+                            {(state.loading?.buyBook || txStatus == 'pending') ? <ReactLoading type="spin" height={20} width={20} /> : <span>Buy Now</span>}
+                        </button>}
+                        {/* <button
                             onClick={handleAddToCart}
                             disabled={!book.inStock}
                             className={`flex-1 px-8 py-4 rounded-lg font-semibold transition-colors ${book.inStock
@@ -246,7 +287,8 @@ export default function BookDetailsPage() {
                                 }`}
                         >
                             Add to Cart
-                        </button>
+                        </button> */}
+                        <CustomWalletConnectButton />
                     </div>
 
                     {/* Description */}
@@ -277,7 +319,7 @@ export default function BookDetailsPage() {
                         </div>
                     </div>
                 </div>
-            </div>);
+            </div >);
         }
     }
 

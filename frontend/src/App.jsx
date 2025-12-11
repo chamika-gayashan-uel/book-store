@@ -9,10 +9,15 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import CreateBookPage from './pages/CreateBookPage';
 import BookDetailsPage from './pages/BookDetailsPage';
+import { getEthPriceUsd } from './controllers/bookController';
 
 const App = () => {
   const { enqueueSnackbar } = useSnackbar();
   const state = useSelector((state) => state);
+
+  useEffect(() => {
+    getEthPriceUsd();
+  }, [])
 
   useEffect(() => {
     if (state.notification?.message) {

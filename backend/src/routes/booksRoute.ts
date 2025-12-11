@@ -1,8 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { Book } from '../models/bookModel';
-import multer from 'multer'
+import { Purchases } from '../models/purchaseModel';
 import { authHandler } from '../middleware/authHandler';
-import path from 'path';
 import fs from "fs";
 
 // const storage = multer.diskStorage({
@@ -32,6 +31,8 @@ router.post('/create', authHandler, async (req: Request, res: Response, next: Ne
 
     const book = await Book.create(newBook);
 
+    // const contractResponse = await mintBook({ _title: title, _bookId: crypto.randomUUID(), _price: price, _royalty: "10", WALLET_ADDRESS: address });
+
     if (req.body.coverImage) {
       const buffer = Buffer.from(req.body.coverImage, "base64");
       fs.writeFileSync(`uploads/${book._id}.jpg`, buffer);
@@ -40,6 +41,45 @@ router.post('/create', authHandler, async (req: Request, res: Response, next: Ne
     return res.status(201).json({
       success: true,
       book
+    });
+
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+});
+
+router.post('/delete', authHandler, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId, id } = req.body;
+
+    if (
+      !id) {
+      return res.status(400).send({
+        message: 'Send all required fields',
+      });
+    }
+
+    const book = await Book.findById(id);
+
+    if (!book) {
+      return res.status(400).send({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.author != userId) {
+      return res.status(400).send({
+        message: 'Unauthorized user',
+      });
+    }
+
+    fs.rmSync(`uploads/${book._id}.jpg`);
+
+    await Book.findByIdAndDelete(id)
+
+    return res.status(201).json({
+      success: true,
     });
 
   } catch (error: any) {
@@ -131,5 +171,64 @@ router.delete('/:id', async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
+
+router.post('/purchase', authHandler, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { bookId, userId } = req.body;
+    if (!bookId) {
+      res.status(400).json({
+        message: "Required fields not found"
+      });
+    }
+
+    const newPurchase = { book: bookId, buyer: userId };
+
+    const purchase = await Purchases.create(newPurchase)
+
+    res.status(200).json({
+      success: true,
+      purchase
+    });
+
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+})
+
+router.post('/purchase-delete', authHandler, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id, userId } = req.body;
+
+    if (!id) {
+      res.status(400).json({
+        message: "Required fields not found"
+      });
+    }
+    const purchase = await Purchases.findById(id);
+
+    if (!purchase) {
+      return res.status(400).json({
+        message: "License not found for this purchase"
+      });
+    }
+
+    if (purchase.buyer != userId) {
+      return res.status(400).json({
+        message: "License not found for this purchase"
+      });
+    }
+
+    await Purchases.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+    });
+
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+})
 
 export default router;
